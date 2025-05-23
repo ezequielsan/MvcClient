@@ -21,7 +21,7 @@ namespace MvcClient.Controllers
 
         // GET: Customers
         // GET: Movies
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
         {
             if (_context.Customer == null)
             {
@@ -37,7 +37,17 @@ namespace MvcClient.Controllers
                 customers = customers.Where(s => s.Name!.ToUpper().Contains(searchString.ToUpper()));
             }
 
-            return View(await customers.ToListAsync());
+            int pageSize = 10;
+            var paginatedCustomers = await PaginatedList<Customer>.CreateAsync(customers.AsNoTracking(), pageNumber, pageSize);
+
+            ViewData["SearchString"] = searchString;
+            ViewData["HasPreviousPage"] = paginatedCustomers.HasPreviousPage;
+            ViewData["HasNextPage"] = paginatedCustomers.HasNextPage;
+            ViewData["PageIndex"] = paginatedCustomers.PageIndex;
+            ViewData["TotalPages"] = paginatedCustomers.TotalPages;
+
+
+            return View(paginatedCustomers);
         }
 
         // GET: Customers/Details/5
@@ -75,6 +85,7 @@ namespace MvcClient.Controllers
             {
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Cliente cadastrado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
@@ -114,6 +125,7 @@ namespace MvcClient.Controllers
                 {
                     _context.Update(customer);
                     await _context.SaveChangesAsync();
+                    TempData["Success"] = "Cliente editado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -158,6 +170,7 @@ namespace MvcClient.Controllers
             if (customer != null)
             {
                 _context.Customer.Remove(customer);
+                TempData["Success"] = "Cliente deletado com sucesso!";
             }
 
             await _context.SaveChangesAsync();
