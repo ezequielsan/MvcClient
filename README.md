@@ -70,6 +70,8 @@ Este projeto é uma aplicação ASP.NET Core MVC que demonstra um sistema de cad
 - Validação de dados no frontend e backend
 - Seed automático de dados de exemplo ao iniciar a aplicação (veja `Models/SeedData.cs`)
 - Pesquisa por nome de cliente na tela de listagem
+- Toast de sucesso ou erro após operações CRUD
+- Paginação na listagem de clientes e fornecedores
 
 ---
 
